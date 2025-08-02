@@ -11,6 +11,8 @@ General usage:
 Code Instructions:
 
 - Use typescript , fully typed with no uses of the `any`.
+- Use Zod to create schemas of data that we expect to receive. So we can validate against them. Keep schemas close to the controller they are used.
+- If zod schema is more general put it in the appropriate place.
 - Routes and Controllers are two different entities and they belong to separate files.
 - Middleware is on its own separate file.
 - Use Prisma as an ORM
