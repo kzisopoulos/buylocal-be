@@ -1,8 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import { Listing, PrismaClient } from "@prisma/client";
+import cors from "cors";
+import corsOptions from "./config/cors";
 
 const prisma = new PrismaClient();
 const app: Express = express();
+
+app.use(cors(corsOptions));
 const port = process.env.PORT || 3000;
 
 app.get("/", async (req: Request, res: Response) => {

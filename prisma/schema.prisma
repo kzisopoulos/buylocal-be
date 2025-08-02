@@ -13,6 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  STORE_OWNER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreOwner {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(STORE_OWNER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Listing {
   id   Int    @id @default(autoincrement())
   name String
