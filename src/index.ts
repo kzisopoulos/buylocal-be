@@ -1,10 +1,13 @@
 import express, { Express, Request, Response } from "express";
+import { Listing, PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, world!");
+app.get("/", async (req: Request, res: Response) => {
+  const listings: Listing[] = await prisma.listing.findMany();
+  res.send(listings.map((l) => `<div>${l.name}</div>`).join(""));
 });
 
 app.listen(port, () => {
