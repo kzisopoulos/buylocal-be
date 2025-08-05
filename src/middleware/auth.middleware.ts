@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { AuthedRequest } from "../types";
@@ -21,17 +21,6 @@ export const protect = async (
       token,
       process.env.JWT_SECRET!
     ) as jwt.JwtPayload;
-    console.log(decoded);
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      select: { id: true, email: true, role: true },
-    });
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized, user not found" });
-    }
     req.user = {
       userId: decoded.id,
     };

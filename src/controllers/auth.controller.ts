@@ -8,6 +8,16 @@ import { ZodError } from "zod";
 const prisma = new PrismaClient();
 const saltRounds = 10;
 
+const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    signed: true,
+    sameSite: isProduction ? ("none" as const) : ("lax" as const),
+  };
+};
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = registerSchema.parse(req.body);
@@ -34,11 +44,7 @@ export const register = async (req: Request, res: Response) => {
       }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      signed: true,
-    });
+    res.cookie("token", token, getCookieOptions());
 
     res.status(201).json({ email: user.email, role: user.role });
   } catch (error) {
@@ -74,11 +80,7 @@ export const login = async (req: Request, res: Response) => {
       }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      signed: true,
-    });
+    res.cookie("token", token, getCookieOptions());
 
     res.status(200).json({ email: user.email, role: user.role });
   } catch (error) {
@@ -87,5 +89,40 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
     res.status(500).json({ message: error });
+  }
+};
+
+export const logout = (_req: Request, res: Response) => {
+  res.clearCookie("token", getCookieOptions());
+  res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const profile = async (req: Request, res: Response) => {
+  const token = req.signedCookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token@@@d" });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as jwt.JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { email: true, role: true },
+    });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(401).json({ message: "Not authorized, token failed" });
   }
 };
