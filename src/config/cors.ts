@@ -1,7 +1,7 @@
 import { CorsOptions } from "cors";
 
 export const allowedOrigins = [
-  "https://buylocal-fe.vercel.app/", // the actuall site when deployed.
+  "https://buylocal-fe.vercel.app", // the actuall site when deployed.
   "http://localhost:4200",
 ];
 
