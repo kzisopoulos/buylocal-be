@@ -101,7 +101,7 @@ export const profile = async (req: Request, res: Response) => {
   const token = req.signedCookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: "Not authorized, no token@@@d" });
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 
   try {
